@@ -20,6 +20,13 @@ git clone https://github.com/livny/RNA-Seq-Pipeline.git
 
     https://docs.github.com/en/authentication/connecting-to-github-with-ssh
 
+    **Note**: 
+    In step 2 of https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#adding-your-ssh-key-to-the-ssh-agent: 
+
+    - If you are installing on the Broad server, choose not to add a passphrase to your key, and omit the UseKeychain line.
+    - If you see a Bad configuration option: usekeychain error, add an additional line to the configuration's' Host *.github.com section.
+
+
 2. Download the code on to your $HOME folder in the Broad server
     ```bash
     # go to your $HOME folder
@@ -42,12 +49,6 @@ Once you finish making changes to the code, use the commands in the following or
 use UGER
 ish
 ```
-
-### Configuration files
-There are two configuration files that are currently in use:
-
-* ```idi/moc_ec/MOC/config_files/PC_config.yaml``` for RtS projects
-* ```idi/moc_ec/MOC/config_files/PC_config_BacDrop.yaml``` for SCR projects
 
 ### Running commands
 It is advised to run all commands from the project root directory, i.e., 
@@ -111,7 +112,7 @@ sh idi/moc_ec/MOC/scripts/QSUB_RtS_analysis_launch.sh <MOC-ID> -user_id :--bwa_m
 
 The only neccesary addition is the config file option. SCR project has a config named 'PC_config_BacDrop.yml' inside the config folder; this is different from the default config file used for RtS projects. If you are finding an error using this config file, provide an absolute path instead of a relative path to the file.
 ```
-sh idi/moc_ec/MOC/scripts/QSUB_RtS_analysis_launch.sh <MOC-ID> -user_id -conf idi/moc_ec/MOC/config_files/PC_config_BacDrop.yml
+sh idi/moc_ec/MOC/scripts/QSUB_RtS_analysis_launch.sh <MOC-ID> -user_id -conf $HOME/RNA-Seq-Pipeline/idi/moc_ec/MOC/config_files/PC_config_BacDrop.yml
 ```
 
 **Running the pipeline for fungal projects:**
@@ -120,7 +121,7 @@ Note that fungal is an eukaryote, so it is treated as a host in the pipeline.So,
 
 In addition, we need to change the config file option. Fungal project has a config named 'PC_config_fungal.yaml' inside the config folder; this is different from the default config file used for RtS projects. If you are finding an error using this config file, provide an absolute path instead of a relative path to the file.
 ```
-sh idi/moc_ec/MOC/scripts/QSUB_RtS_analysis_launch.sh <MOC-ID> -user_id -conf idi/moc_ec/MOC/config_files/PC_config_fungal.yaml -move_ref N -do_host
+sh idi/moc_ec/MOC/scripts/QSUB_RtS_analysis_launch.sh <MOC-ID> -user_id -conf $HOME/RNA-Seq-Pipeline/idi/moc_ec/MOC/config_files/PC_config_fungal.yaml -move_ref N -do_host
 ```
 
 **Running the pipeline for fungal SCR projects:**
@@ -133,7 +134,7 @@ In addition, we need to change the config file option. SCR fungal project has a 
 
 Sometime, in SCR projects, we have noticed errors trying to align reads to the host genome. The source of the error orignates to the pipeline unable to correctly parse the "Host_reference" tab in the Key file. This only happens to the SCR Key Files.
 ```
-sh idi/moc_ec/MOC/scripts/QSUB_RtS_analysis_launch.sh <MOC-ID> -user_id -conf idi/moc_ec/MOC/config_files/PC_config_fungal_BacDrop.yml -move_ref N -do_host
+sh idi/moc_ec/MOC/scripts/QSUB_RtS_analysis_launch.sh <MOC-ID> -user_id -conf $HOME/RNA-Seq-Pipeline/idi/moc_ec/MOC/config_files/PC_config_fungal_BacDrop.yml -move_ref N -do_host
 ```
 
 **Running the pipeline without split:**
@@ -178,7 +179,7 @@ sh idi/moc_ec/MOC/scripts/MOC_wu_move.sh MOCS-0004 H52G2DMXY
 **Command line options:**
 ```
 -move_data: include if you want to move data from getsite.  (Default Y)
--conf: path to config file.  (Default idi/moc_ec/MOC/config_files/PC_config.yaml)
+-conf: path to config file.  (Default $HOME/RNA-Seq-Pipeline/idi/moc_ec/MOC/config_files/PC_config.yaml)
 -metrics: run metrics script (Default Y)
 -raw_seq_path: the target location for the data (Defaults path designated by “Seq_base:” in the config file)
 ```
