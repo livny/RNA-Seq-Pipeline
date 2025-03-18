@@ -487,3 +487,4 @@ self.candida_albicans_ref_str = self.get_from_mydict('candida_albicans_ref_str')
 self.candida_albicans_SC5314_transcript_gene = self.get_from_mydict('candida_albicans_SC5314_transcript_gene')
 ```
 
+test
