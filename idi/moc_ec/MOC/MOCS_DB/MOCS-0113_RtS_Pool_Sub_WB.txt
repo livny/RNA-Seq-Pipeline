@@ -1,0 +1,22 @@
+### sid: 1PaU_LLorZFzPLqb_tXERf5ILVnvILx8k-6Jt3coavn0
+
+MOCS-ID		MOCS-0113						Target	Expected		Water to add	Minimum vol to pipette
+Seq platform		NovaSeq_XP 300					Read pairs (M)	2250	2075		8.24	0.50
+							Concentration (nM)	4	4.00
+							Volume (uL)	95	86.76
+							Amount (fm)	380	380.38
+
+
+
+
+MOCS_ID	Pool ID	Cycle #	Index1_ID	Index2_ID	Replicate	samples/pool	Conc (ng/µL)	Avg size (nts)	Target reads per sample (M)	Vol (µL)	dsDNA MW (g/mol)	nmol/L = fmol/µL	Total reads per pool (M)	% target reads per pool	% of pool	fmol to add	Undiluted volume to add (µL)	Dilution	Diluted volume to add (µL)	Pool_ID	WB URL	Pool Location	Plate Name		1	1
+
+MOCS-0113	MOCP-0210p1	15	X109	P69	1	16	1.75	482	25		297,892.76	5.87	400		19.3	73.34	12.48	1	12.48	MOCP-0210p1	MOCP-0210, MOCP-0209 Enr_WB	A1	ENR-0174		1	1
+		15
+MOCS-0113	MOCP-0210p3	15	X111	P71	1	16	1.38	490	25		302,836.44	4.56	400		19.3	73.34	16.09	1	16.09	MOCP-0210p3	MOCP-0210, MOCP-0209 Enr_WB	A3	ENR-0174		1	1
+
+
+MOCS-0113	MOCP-0209p1	15	X114	P74	1	15	0.30	538	5		332,498.52	0.91	75		3.6	13.68	14.96	1	14.96	MOCP-0209p1	MOCP-0210, MOCP-0209 Enr_WB	A6	ENR-0174		1	1
+MOCS-0113	MOCP-0210p2	15	X116	P76	2	16	1.49	550	25		339,914.04	4.38	400		19.3	73.34	16.73	1	16.73	MOCP-0210p2	MOCP-0210, MOCP-0209 ENR-0175 re-enr_WB	A1	ENR-0175		1	1
+MOCS-0113	MOCP-0210p4	15	X117	P77	2	16	2.20	527	25		325,700.96	6.75	400		19.3	73.34	10.86	1	10.86	MOCP-0210p4	MOCP-0210, MOCP-0209 ENR-0175 re-enr_WB	A2	ENR-0175		1	1
+MOCS-0113	MOCP-0210p5	15	X118	P78	2	16	1.51	521	25		321,993.20	4.69	400		19.3	73.34	15.64	1	15.64	MOCP-0210p5	MOCP-0210, MOCP-0209 ENR-0175 re-enr_WB	A3	ENR-0175		1	1

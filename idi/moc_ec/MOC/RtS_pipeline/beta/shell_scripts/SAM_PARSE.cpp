@@ -207,10 +207,10 @@ int main (int argc, char* argv[])
 		{
 			TOO_SHORT='Y';
 			total_short++;		 	
-			cerr << "*******	" << S[1].ID << " " << S[1].FLAG << " " << FIRST << " " << R_REV << " " << M_REV << " " << M_UM << " " << len << endl;
+			//cerr << "*******	" << S[1].ID << " " << S[1].FLAG << " " << FIRST << " " << R_REV << " " << M_REV << " " << M_UM << " " << len << endl;
 		}
 	
-		cerr << S[1].ID << " " << S[1].FLAG << " " << FIRST << " " << R_REV << " " << M_REV << " " << M_UM << " " << len << endl;
+		//cerr << S[1].ID << " " << S[1].FLAG << " " << FIRST << " " << R_REV << " " << M_REV << " " << M_UM << " " << len << endl;
 		
 		//cerr << S[1].ID << endl;
 		S[1].STRAND='0';		

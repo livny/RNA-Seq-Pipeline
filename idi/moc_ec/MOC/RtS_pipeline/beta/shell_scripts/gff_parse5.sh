@@ -165,6 +165,12 @@ ALL_GFF_REPS=`cat $GFF_FILE | tr '\r' '\n' | sed 1d | sed -e 's/ /_/g' -e 's/(//
 
 for REP in $ALL_GFF_REPS
 do	
+	echo $REP
+done
+
+
+for REP in $ALL_GFF_REPS
+do	
 	echo "REP: " $REP
 	
 	GFF_ACC_FILE=$TEMP_DIR"/"$ACC"_"$REP"_rep.gff"

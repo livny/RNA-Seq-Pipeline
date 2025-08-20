@@ -1,0 +1,50 @@
+### sid: 1uxKB-jd2glBjuq-xCD-Boz7WmidnftkS3RbAJjUF19I
+
+MOCS-ID								Target	Expected		Water to add	Minimum vol to pipette
+Seq platform		NovaSeq_SP 100					Read pairs (M)	500	0		60.00	0.50
+							Concentration (nM)	4	0.00
+							Volume (uL)	60	0.00
+							Amount (fm)	240	0.00
+
+
+
+
+MOCS_ID	Pool ID	Cycle #	#DIV/0!	#DIV/0!	Replicate	samples/pool	Conc (ng/µL)	Avg size (nts)	Target reads per sample (M)	Vol (µL)	dsDNA MW (g/mol)	nmol/L = fmol/µL	Total reads per pool (M)	% target reads per pool	% of pool	fmol to add	Undiluted volume to add (µL)	Dilution	Diluted volume to add (µL)	Pool_ID	WB URL	Pool Location	Plate Name		#DIV/0!	#DIV/0!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+																		3
+
+
+
+
+																		3

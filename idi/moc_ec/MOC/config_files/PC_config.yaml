@@ -111,6 +111,7 @@ check_module_script: idi/moc_ec/MOC/scripts/check_RtS_module.sh
 wbmov_metrics_script: idi/moc_ec/MOC/scripts/MOCS_move.sh
 report_script: idi/moc_ec/MOC/scripts/KeyMetrics_report.sh
 bash_header: idi/moc_ec/MOC/scripts/bash_header
+fastq_trimmer: idi/moc_ec/MOC/scripts/RtS_trim_fastq.sh
 
 pipe_script_dir: idi/moc_ec/MOC/RtS_pipeline/beta/
 bc_splitter: idi/moc_ec/MOC/RtS_pipeline/BarcodeSplitter/bc_splitter
