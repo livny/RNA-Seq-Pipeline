@@ -60,12 +60,12 @@ keep_max_files ()
 #$SCRIPTS_DIR"GS_import.py" -s $SP_GID -t "BETA submission log" -p $DSTAMP --Key_dir $SUB_DIR -S $SUB_SUFF
 #$SCRIPTS_DIR"GS_import.py" -s $SP_GID -t "BETA pooling log" -p $DSTAMP --Key_dir $POOL_DIR -S $POOL_SUFF
 #$SCRIPTS_DIR"GS_import.py" -s $DB_GID -t "MOC Project Database" -p $DSTAMP --Key_dir $MOCDB_DIR -S $MOCDB_SUFF
-echo "$SCRIPTS_DIR"GS_import.py" -s $MOCS_GID -t "MOCS DB" -p $DSTAMP --Key_dir $MOCSDB_DIR -S $MOCSDB_SUFF"
-$SCRIPTS_DIR"GS_import.py" -s $MOCS_GID -t "MOCS DB" -p $DSTAMP --Key_dir $MOCSDB_DIR -S $MOCSDB_SUFF
-echo "$SCRIPTS_DIR"GS_import.py" -s $PC_GID -t "Production Database" -p $DSTAMP --Key_dir $PCDB_DIR -S $PCDB_SUFF"
-$SCRIPTS_DIR"GS_import.py" -s $PC_GID -t "Production Database" -p $DSTAMP --Key_dir $PCDB_DIR -S $PCDB_SUFF
-echo "$SCRIPTS_DIR"GS_import.py" -s $PC_GID -t "Production Quote DB" -p $DSTAMP --Key_dir $PCQ_DIR -S $PCQ_SUFF"
-$SCRIPTS_DIR"GS_import.py" -s $PC_GID -t "Production Quote DB" -p $DSTAMP --Key_dir $PCQ_DIR -S $PCQ_SUFF
+echo "$scripts_dir/"GS_import.py" -s $MOCS_GID -t "MOCS DB" -p $DSTAMP --Key_dir $MOCSDB_DIR -S $MOCSDB_SUFF"
+$scripts_dir"/GS_import.py" -s $MOCS_GID -t "MOCS DB" -p $DSTAMP --Key_dir $MOCSDB_DIR -S $MOCSDB_SUFF
+echo "$scripts_dir/"GS_import.py" -s $PC_GID -t "Production Database" -p $DSTAMP --Key_dir $PCDB_DIR -S $PCDB_SUFF"
+$scripts_dir"/GS_import.py" -s $PC_GID -t "Production Database" -p $DSTAMP --Key_dir $PCDB_DIR -S $PCDB_SUFF
+echo "$scripts_dir/"GS_import.py" -s $PC_GID -t "Production Quote DB" -p $DSTAMP --Key_dir $PCQ_DIR -S $PCQ_SUFF"
+$scripts_dir"/GS_import.py" -s $PC_GID -t "Production Quote DB" -p $DSTAMP --Key_dir $PCQ_DIR -S $PCQ_SUFF
 
 change_perms $SUB_DIR $POOL_DIR $MOCDB_DIR $PCDB_DIR
 

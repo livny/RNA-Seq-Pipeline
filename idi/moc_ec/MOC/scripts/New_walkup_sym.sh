@@ -11,7 +11,7 @@ FCID=$2
 	  file_path="$PWD/${BASH_SOURCE[0]}"
 	fi
 
-scripts_dir="$(dirname $file_path)"
+scripts_dir="$(dirname $file_path)/"
 
 # source idi/moc_ec/MOC/scripts/bash_header
 	source "$scripts_dir/bash_header"
@@ -25,6 +25,7 @@ scripts_dir="$(dirname $file_path)"
 ### determining paths and headers 
 	paths_and_headers $ID $@
 
+echo 
 ### set paths to directories, files, and scripts from config file
 ### default config file is /idi/moc_ec/MOC/config_files/PC_config.yaml
 	PROJECT_ROOT_DIR="$(dirname $(dirname $(dirname $(dirname $(dirname $file_path)))))"
@@ -56,13 +57,13 @@ scripts_dir="$(dirname $file_path)"
 	TEMP_DIR=$TEMP_PATH"/MOCS_move/"
 	mkdir -p $TEMP_DIR
 
-	FASTQ_DIR=$FC_DIR"/fastq/"
 	FASTQ_FILE=$TEMP_PATH"/MOCS_COMBOS_fastqs.txt"
 
 	mkdir -p $POOL_SYMDIR
 
 
 ########### pull desktop files for all/recently changed MOCS submission wbs from $GWB_DIR
+echo "pull desktop files for all/recently changed MOCS submission wbs from $GWB_DIR"
 
 	GMOCPM_PATH=`config_read $CONFIG_FILE gdrivepm_path`
 	GWB_DIR=$GMOCPM_PATH"/MOCS_WBs/"
@@ -114,13 +115,14 @@ scripts_dir="$(dirname $file_path)"
 	fi
 	### Use GIDs to download WBs from $GWB_DIR into $LOCAL_DIR 
 
+
 	for FILE in $ALL_FILES
 	do
 		GID=`cat $FILE | grep "URL" | cut -d"/" -f6`
 		NAME=`cat $FILE | grep "Name=" | cut -d"=" -f2 | sed 's/_Pool_Sub_WB//g'`
 
-		echo "$SCRIPTS_DIR"GS_import.py" -s $GID -t "Pooling" -p $NAME --Key_dir $MOCSDB_DIR -S "_Pool_Sub_WB.txt""
-		$SCRIPTS_DIR"GS_import.py" -s $GID -t "Pooling" -p $NAME --Key_dir $MOCSDB_DIR -S "_Pool_Sub_WB.txt" 
+		echo "$scripts_dir"GS_import.py" -s $GID -t "Pooling" -p $NAME --Key_dir $MOCSDB_DIR -S "_Pool_Sub_WB.txt""
+		$scripts_dir"GS_import.py" -s $GID -t "Pooling" -p $NAME --Key_dir $MOCSDB_DIR -S "_Pool_Sub_WB.txt" 
 
 	done
 
@@ -145,13 +147,25 @@ scripts_dir="$(dirname $file_path)"
 
 ###### Make symlinks with pool IDs in MOCS and MOC dirs
 ### Make symlinks in MOCS dir
+echo "Making symlinks in MOCS dir"
 
 	#  making MOCS symlinks dir
 	MOCS_SYMDIR=$MOCSDB_DIR"/SymLinks/"$MOCS"/"
 	mkdir -p $MOCS_SYMDIR
 
-	ALL_FILES=`ls -lrt $FASTQ_DIR | grep fastq | awk '{print $9}'`
+	FASTQ_DIR_LEVEL=`ls -lrt $FC_DIR | grep -w fastq | awk '{print $NF}' | wc -l `
+	
+	echo $FASTQ_DIR_LEVEL
+	if [ $FASTQ_DIR_LEVEL == "1" ];then
+		FASTQ_DIR=$FC_DIR"/fastq/"
+	else
+		FASTQ_SUB=`ls -lrt $FC_DIR | grep -v total | tail -1 | awk '{print $NF}' `
+		FASTQ_DIR=$FC_DIR"/"$FASTQ_SUB"/fastq/"
+	fi
+	echo $FASTQ_DIR
+	echo $FASTQ_DIR_LEVEL
 
+	ALL_FILES=`ls -lrt $FASTQ_DIR/ | grep fastq | grep -v $MOCS | grep -e "R2" -e "R1" | awk '{print $9}'`
 
 	#  Using MOCS WB to link index IDs to pool IDs
 	MOCS_COMBOS=`cat $MOCS_DB | grep $MOCS`
@@ -187,6 +201,7 @@ scripts_dir="$(dirname $file_path)"
 
 	
 ### Make symlinks in MOC dirs
+echo "Making symlinks in MOC dirs"
 
 	# Pull out all MOCIDs
 	ALL_FILES=`ls -lrt $MOCS_SYMDIR | grep -v Undeter | grep fastq | grep -v _X | awk '{print $9}'`
@@ -209,7 +224,7 @@ scripts_dir="$(dirname $file_path)"
 
 	# Make symdirs for all MOCIDs
 	
-	echo $ALL_MOCIDS
+	echo "ALL_MOCIDS:" $ALL_MOCIDS
 	
 	for MOCID in $ALL_MOCIDS
 	do
@@ -274,7 +289,8 @@ scripts_dir="$(dirname $file_path)"
 	done 
 	
 	if [ $METRICS == "Y" ];then
-		echo "sh $SCRIPTS_DIR"/MOC_walkup_metrics3.sh" $MOCS"
-		sh $SCRIPTS_DIR"/MOC_walkup_metrics3.sh" $MOCS
+		echo "Running metrics..."
+		echo "sh $scripts_dir"/MOC_walkup_metrics3.sh" $MOCS"
+		sh $scripts_dir"/MOC_walkup_metrics3.sh" $MOCS
 
 	fi

@@ -249,7 +249,7 @@ paths_and_headers ()
 	if [[ $DUAL_INDEX_SCRIPT != /* ]]; then
 		DUAL_INDEX_SCRIPT="$PROJECT_ROOT_DIR/$DUAL_INDEX_SCRIPT"
 	fi
-
+ 
 	WU_SCRIPT=`config_read $CONFIG_FILE wu_metrics_script`
 	if [[ $WU_SCRIPT != /* ]]; then
 		WU_SCRIPT="$PROJECT_ROOT_DIR/$WU_SCRIPT"
@@ -268,6 +268,11 @@ paths_and_headers ()
 	BASH_HEADER=`config_read $CONFIG_FILE bash_header`
 	if [[ $BASH_HEADER != /* ]]; then
 		BASH_HEADER="$PROJECT_ROOT_DIR/$BASH_HEADER"
+	fi
+
+	FASTQ_TRIM_SCRIPT=`config_read $CONFIG_FILE fastq_trimmer`
+	if [[ $FASTQ_TRIM_SCRIPT != /* ]]; then
+		FASTQ_TRIM_SCRIPT="$PROJECT_ROOT_DIR/$FASTQ_TRIM_SCRIPT"
 	fi
 
 	
@@ -318,8 +323,10 @@ paths_and_headers ()
 	KEY_SHEET=`extract_option -key_sheet "Sample_Information" 1 $SCRIPT_OPTIONS | sed 's/Sample_Information/Sample Information/g'`
 	KEY_TYPE=`extract_option -key_type P 1 $SCRIPT_OPTIONS`
 	TEST_PIPE=`extract_option -test_pipe N 1 $SCRIPT_OPTIONS`
-	DO_HOST=`extract_option -do_host N 1 $SCRIPT_OPTIONS`
 	NUM_TEST_READS=`extract_option -num_test_reads 10000 1 $SCRIPT_OPTIONS`
+	TRIM_READS=`extract_option -trim_reads N 1 $SCRIPT_OPTIONS` # pre-trim reads
+	TRIM_LEN=`extract_option -trim_len 0-50,5-55 1 $SCRIPT_OPTIONS` # target trim length
+	DO_HOST=`extract_option -do_host N 1 $SCRIPT_OPTIONS`
 	ADD_UMI_TO_READ_ID=`extract_option -add_umi_to_read_id N 1 $SCRIPT_OPTIONS`
 	TRIM_MINLEN=`extract_option -trim_minlen 25 1 $SCRIPT_OPTIONS` # minimum length of read to keep after trimming/alignment
 	WB_MOVE=`extract_option -wb_move Y 1 $SCRIPT_OPTIONS`
@@ -379,6 +386,7 @@ paths_and_headers ()
 	
 	TEMP_DIR=$TEMP_PATH"/"$RESPATH_SUFF"/"$ALL_PROJID"/"
 	MERGE_DIR=$TEMP_DIR"mergedir/"
+	MERGE_TRIM_DIR=$TEMP_DIR"mergedir/trimmed"
 	SPLIT_DIR=$TEMP_DIR"splitdir/"
 	DATA_DIR=$TEMP_DIR"datadir/"
 	ALIGN_DIR=$TEMP_DIR"patho_result/"$ALL_PROJID"/"
@@ -387,6 +395,7 @@ paths_and_headers ()
 	MOC_SYM_DIR=$RAWSYM_PATH"/"$MOC_ID
 	MOC_SYM_TEST_DIR=$TEMP_DIR"/pipe_test/"
 	MOC_SYM_TEST_UMI_DIR=$TEMP_DIR"/pipe_test_umi/"
+	MOC_SYM_TRIM_DIR=$TEMP_DIR"/trimmed_reads/"
 
 	SPLIT_DIR=`extract_option -split_dir $SPLIT_DIR 1 $@`
 	MERGE_DIR=`extract_option -merge_dir $MERGE_DIR 1 $@`

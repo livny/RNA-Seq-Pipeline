@@ -3,10 +3,21 @@
 
 MOC_ID=$1
 
-source /idi/moc_ec/MOC/scripts/bash_header
+# get path of the current file
+file_path="${BASH_SOURCE[0]}"
+# if the file path is relative, convert it to absolute path
+if [[ $file_path != /* ]]; then
+  file_path="$PWD/${BASH_SOURCE[0]}"
+fi
 
-### source all functions 
-source "/idi/moc_ec/MOC/scripts/MOC_functions.sh"
+scripts_dir="$(dirname $file_path)"
+
+
+# source idi/moc_ec/MOC/scripts/bash_header
+source "$scripts_dir/bash_header"
+
+# source "idi/moc_ec/MOC/scripts/MOC_functions.sh"
+source "$scripts_dir/MOC_functions.sh"
 
 ### determining paths and headers 
 ### default config file is /broad/IDP-Dx_storage/MOC/config_files/PC_config.yaml
@@ -29,7 +40,7 @@ COLLAB=`extract_option -collab Y 1 $@`
 ##	If -user_id followed by userID, add userID to RESPATH_SUFF.
 
 path_suff $@
-
+ 
 ### get paths etc. from config file
 KEY_DIR=`config_read $CONFIG_FILE Key_base`
 USER_GUIDE=`config_read $CONFIG_FILE user_guide`
@@ -99,10 +110,12 @@ fi
 echo $G_ID 
 
 ############## moving key file to server ###############
+############################ MOVE KEY FILE TO SERVER ###################################
+	
+############### moving key file to server #############################
 if [ $MOVE_KEY == "Y" ];then 
-	echo "Moving key file to server..."
-	echo "$KEY_SCRIPT -s $G_ID -t \"$KEY_SHEET\" -p $MOC_ID --Key_dir $KEY_DIR"
-	$KEY_SCRIPT -s $G_ID -t "$KEY_SHEET" -p $MOC_ID --Key_dir $KEY_DIR
+	echo "Running move_key..."
+	move_key		
 	### if key file not found or empty, stop pipeline
 	if [ ! -s $KEY_FILE ];then
 		ls -lrt $KEY_FILE
@@ -121,8 +134,8 @@ if [ $PROJ_TYPE == "P" ];then
 
 	############## Import google sheet databases to server ###############=
 	if [ $IMPORT_GS == "Y" ];then
-		echo "Running $GSIMPORT_SCRIPT to import google sheet databases to server"
-		sh $GSIMPORT_SCRIPT
+		echo "Running $scripts_dir"/"GS_import.sh to import google sheet databases to server"
+		sh $scripts_dir"/GS_import.sh"
 	fi
 	########################################################
 	DB_FILE=`ls -lrt $PCDB_DIR/*$PCDB_SUFF | tail -1 | awk '{print $9}'`
@@ -163,16 +176,18 @@ fi
 echo "COL_EMAIL:" $COL_EMAIL
 
 ### update data transfer DB ####
-
-date=`date "+%D"`
-edate=`date +%s`
-ID=`id -un`
-echo $MOC_ID 	$date	$edate	$COL_EMAIL	$DATA_EMAIL	$INTERNAL	$ID >> $DATA_DB
-
-ls -lrt $DATA_DB
-cat $DATA_DB
+# 
+# date=`date "+%D"`
+# edate=`date +%s`
+# ID=`id -un`
+# echo $MOC_ID 	$date	$edate	$COL_EMAIL	$DATA_EMAIL	$INTERNAL	$ID >> $DATA_DB
+# 
+# ls -lrt $DATA_DB
+# cat $DATA_DB
 
 ### move files to Gdrive ########
+
+echo $ALL_PROJ_ID
 
 for PROJ_ID in $ALL_PROJ_ID
 do
