@@ -158,9 +158,12 @@ echo "Printing merge directory before move and ref files: $MERGE_DIR"
 
 if [ $TEST_PIPE == "Y" ];then
 	make_test_fastqs $NUM_TEST_READS
+fi
+if [ $TEST_PIPE == "Y" ] || [ $TEST_PIPE == "R" ];then
 	MOC_SYM_DIR=$MOC_SYM_TEST_DIR
 fi
 ##############################################################################
+
 
 ######################  IF ADD_UMI_TO_READ_ID  #########################################
 # relevant only for SCR Projects where UMI is added to read ID
@@ -326,11 +329,13 @@ fi
 
 ##########################################################################
 
+
+
 ############################ Preprocessing: Run Trimmomatic to trim adapter sequences ################
 
 TRIMMOMATIC=`extract_option -trimmomatic N 1 $@`
 
-if [ $TRIMMOMATIC_SAMPLE == "N" ] && [ $TRIMMOMATIC == "Y" ]; then
+if [ $TRIMMOMATIC_SAMPLE == "N" ] && [ $TRIMMOMATIC == "Y" ] && [ $TRIM_READS == "N" ]; then
 
 	echo "Running Trimmomatic to trim adapter from read sequences............."
 
@@ -440,6 +445,7 @@ fi
 		############## Check if all files were merged ##############
 		mod_check $MOC_ID $CHECK_DIR $ALL_SUFF -fail_exit N -email Y $@
 	fi
+
 ##########################################################################
 
 ANALYSIS_SAMPLE_DIR=$MERGE_DIR"/analysis"
@@ -450,10 +456,50 @@ mkdir -p $ANALYSIS_SAMPLE_DIR
 change_perms $ANALYSIS_SAMPLE_DIR
 
 
+##//// added 3/30/25
+############################ Trimming reads by set lengths ################
+	if [ $TRIM_READS == "S" ];then
+		
+		MERGE_DIR=$MERGE_TRIM_DIR
+	fi
+	if [ $TRIM_READS == "Y" ];then
+		###################
+		
+		mkdir -p $MERGE_TRIM_DIR
+
+		echo "Making fastqs with R1 trimmed from $READ1_START to $READ1_END and R2 trimmed from $READ2_START to $READ2_END for all fastqs in $MERGE_DIR and writing them out to $MERGE_TRIM_DIR..."
+		ALL_FASTQ=`ls -lrt $MERGE_DIR/*gz | grep fastq | awk '{print $9}'`
+		
+		SEG_FILE="FQ_trim_SGE.txt"
+		TEMP_FILE=$MOC_ID"_trim_temp.txt"
+
+		for FASTQ in $ALL_FASTQ
+		do
+	
+			echo "Launching UGER job for "$FASTQ
+			echo "sh $FASTQ_TRIM_SCRIPT $FASTQ $TRIM_LEN $MERGE_DIR $MERGE_TRIM_DIR"
+			echo "sh $FASTQ_TRIM_SCRIPT $FASTQ $TRIM_LEN $MERGE_DIR $MERGE_TRIM_DIR" > $TEMP_FILE
+			qsub $TEMP_FILE >> $SEG_FILE					
+		done
+		
+		echo $SEG_FILE
+		qstat
+		echo "Jobs submitted - waiting for them to complete...."
+		SGE_test $SEG_FILE	
+	
+		MERGE_DIR=$MERGE_TRIM_DIR
+		ls -lrt $MERGE_DIR
+		echo $MERGE_DIR
+		echo $MERGE_TRIM_DIR
+		echo $TRIM_READS
+	
+	fi
+##############################################################################
+##///////
 
 ############################ Preprocessing: Run Trimmomatic to trim adapter sequences on sample level data ################
 
-if [ $TRIMMOMATIC_SAMPLE == "Y" ]; then
+if [ $TRIMMOMATIC_SAMPLE == "Y" ] && [ $TRIM_READS == "N" ]; then
 
 	echo "Running Trimmomatic to trim adapter from read sequences on sample-level data............."
 
