@@ -1,7 +1,7 @@
 MOC_script_path: idi/moc_ec/MOC/scripts/
 Key_base: /idi/moc_ec/MOC/Key_files/
 Seq_base: /idi/moc_ec/RawSeq_data/RtS/ 
-RawSeq_sym_path: /idi/moc_ec/RawSeq_data/RtS/SymLinks/
+RawSeq_sym_path: /idi/moc_ec/RawSeq_data/SymLinks/
 Temp_path: /broad/hptmp/RNASeq_proj/MOC/
 IndSplit_path: /idi/moc_ec/hptmp/RNASeq_proj/MOC/index_split/
 Bam_path: /idi/moc_ec/idpweb/data/MOC/
@@ -11,7 +11,7 @@ Bacterial_Ref_path: /idi/moc_ec/NCBI_files2/
 genbank_ref_path: /idi/moc_ec/MOC/genbank/
 gdrivelocal_path: /idi/moc_ec/MOC/MOC_gdrive/
 Align_path:  /idi/moc_ec/BactRAP/align/
-Walkup_path: /seq/walkup/picard/
+Walkup_path: /idi/moc_ec/RawSeq_data/Walkup/
 qiime_path: /idi/moc_ec/RawSeq_data/16S/16S_results/
 stock_log_path: MOC/BMB_strains/BMB_stock_logs/
 stock_log_local: /broad/moc/BMB/stock_logs/
@@ -26,7 +26,9 @@ gdrivePC_path:  MOC/IDMP_PC/Production/Projects/
 gdriveDEV_path:  MOC/IDMP_PC/Development/ 
 gdriveGCIDTC_path:  MOC/GCID_TC/Projects/ 
 gdriveCIS_path:  MOC/CISID/Projects/ 
+gdriveTRF_path:  MOC/Transfyr-MOC/Projects/ 
 gdrivepm_path:  MOC/IDMP_PC/Project_management/
+gdriveHVP_path:  MOC/HVP/Projects/ 
 
   
 #----------------------------
@@ -69,6 +71,8 @@ Production_prefixes:    MOCP
 Dev_prefixes:   RtS
 TC_prefixes:    DAB;SWB;ITS;SWG
 CIS_prefixes:   SCR;DRS;HPV
+TRF_prefixes:   TRF
+HVP_prefixes:   HVP
 
 
 #----------------------------------------------------
@@ -87,6 +91,7 @@ Single_Index_split_script: idi/moc_ec/MOC/RtS_pipeline/BarcodeSplitter/IndexSpli
 Dual_Index_split_script: idi/moc_ec/MOC/RtS_pipeline/dual_indexed_bc/IndexSplitterMain.py 
 qsub_script: idi/moc_ec/MOC/scripts/MOC_QSUB_launch.sh
 join_script: idi/moc_ec/MOC/scripts/MOC_KeyMets_Join.sh
+keyMetrics_analysis_script: idi/moc_ec/MOC/scripts/keymetrics_analysis2.py
 poolwise_metrics_script: idi/moc_ec/MOC/scripts/poolwise_metrics.py
 join_key_metrics_with_trimmomatic_script: idi/moc_ec/MOC/scripts/join_trimmomatic_and_key_metrics.py
 keyfile_importer: idi/moc_ec/MOC/RtS_pipeline/beta/quickstart.py
