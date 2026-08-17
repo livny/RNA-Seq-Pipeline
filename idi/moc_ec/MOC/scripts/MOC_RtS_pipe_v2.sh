@@ -14,13 +14,15 @@ scripts_dir="$(dirname $file_path)"
 # source idi/moc_ec/MOC/scripts/bash_header
 source "$scripts_dir/bash_header"
 
-
 ### source all functions 
 # source "idi/moc_ec/MOC/scripts/MOC_functions.sh"
 source "$scripts_dir/MOC_functions.sh"
 
+ls -lrt $scripts_dir/MOC_functions.sh
+
 Q_HEAD="MOC_ID"
 USID=`USID`
+
 
 # identify options to pass to this script (as opposed to the pipeline)
 SCRIPT_OPTIONS=`echo $@ | cut -d":" -f1,3`
@@ -49,7 +51,7 @@ paths_and_headers $MOC_ID $@
 	############### moving key file to server #############################
 	if [ $MOVE_KEY == "Y" ];then 
 		echo "Running move_key..."
-		move_key		
+		move_key
 	fi
 ##########################################################################
 
@@ -58,6 +60,7 @@ paths_and_headers $MOC_ID $@
 ### default config file is /broad/IDP-Dx_storage/MOC/config_files/PC_config.yaml
 paths_and_headers $MOC_ID $@
 
+echo $TEMP_DIR
 
 ### run path_suff function to set RESPATH_SUFF.
 ##	If -moc_id N included in command line, do not moc_ID to RESPATH_SUFF.  
@@ -102,16 +105,56 @@ if [ $PIPE_COMMAND_FLAG == "0" ];then
 	PIPE_OPTIONS=$DEFAULT_PIPE_OPTIONS
 else
 	if [ $PIPE_COMMAND_DEF == "0" ];then
-		PIPE_OPTIONS=$PIPE_COMMAND_OPTIONS" "$DEFAULT_PIPE_OPTIONS 
+		MATCH="N"
+		MOD_DEF_OPTIONS=`for DEF in $DEFAULT_PIPE_OPTIONS
+						do
+							if [[ "$DEF" == "--"* ]]; then
+								printf "%s " $DEF
+								PAR=$DEF
+							else
+								VAL=$DEF
+								for MOD in $PIPE_COMMAND_OPTIONS
+								do
+									if [ $MATCH == "Y" ];then
+										VAL=$MOD
+										MATCH="N"
+									fi
+									if [ $MOD == $PAR ];then
+										MATCH="Y"
+									fi
+								done	
+								printf "%s " $VAL
+							fi
+						done`
+		PIPE_OPTIONS=$MOD_DEF_OPTIONS" "$PIPE_COMMAND_OPTIONS
 	else
 		PIPE_OPTIONS=`echo $PIPE_COMMAND_OPTIONS" " | sed 's/\--no_def_opt//g'`
 	fi
 fi
-echo $PIPE_OPTIONS
 
+echo "Pipe options:" 
+echo $PIPE_OPTIONS
+echo "Default options:" 
+echo $DEFAULT_PIPE_OPTIONS
+
+
+echo "Pipe options:" 
+echo $PIPE_OPTIONS
+echo "Pipeline options:" 
+echo $DEFAULT_PIPE_OPTIONS
+
+RUN_DATE=`date +"%m/%d/%Y %H:%M:%S"`
+WRAPPER_OPTIONS=$@
+$PIPE_OPTIONS
+
+RUN_RECORD=$RESULTS_DIR"/Run_record.txt"
+
+echo "Run date and time:" $RUN_DATE >> $RUN_RECORD
+echo "WRAPPER_OPTIONS:" $WRAPPER_OPTIONS >> $RUN_RECORD
+echo "PIPE_OPTIONS:" $PIPE_OPTIONS >> $RUN_RECORD
+echo "-----------------" >> $RUN_RECORD
 
 ##########################################################################
-
 
 
 ############################ SET TEMP DIR PATHS ###################################
@@ -132,6 +175,8 @@ echo $KEY_SHEET
 
 echo "Printing merge directory before move and ref files: $MERGE_DIR"
 
+
+
 ############################ MOVE AND PARSE REF FILES ###################################
 
 	############## Move references from Gdrive or ref dir and parse --> data dir ###############
@@ -143,7 +188,6 @@ echo "Printing merge directory before move and ref files: $MERGE_DIR"
 		echo "Moving references to appropriate directory"	
 		echo "sh $REF_MOVE_SCRIPT $MOC_ID -data_dir $DATA_DIR -parse $PARSE_REF -move_key N -proj_type $PROJ_TYPE $@"
 		sh $REF_MOVE_SCRIPT $MOC_ID -data_dir $DATA_DIR -parse $PARSE_REF -move_key N -proj_type $PROJ_TYPE $@
-	
 
 
 		############## Check if all gff files were parsed ##############
@@ -162,8 +206,8 @@ fi
 if [ $TEST_PIPE == "Y" ] || [ $TEST_PIPE == "R" ];then
 	MOC_SYM_DIR=$MOC_SYM_TEST_DIR
 fi
-##############################################################################
 
+##############################################################################
 
 ######################  IF ADD_UMI_TO_READ_ID  #########################################
 # relevant only for SCR Projects where UMI is added to read ID
@@ -330,7 +374,6 @@ fi
 ##########################################################################
 
 
-
 ############################ Preprocessing: Run Trimmomatic to trim adapter sequences ################
 
 TRIMMOMATIC=`extract_option -trimmomatic N 1 $@`
@@ -458,6 +501,7 @@ change_perms $ANALYSIS_SAMPLE_DIR
 
 ##//// added 3/30/25
 ############################ Trimming reads by set lengths ################
+	
 	if [ $TRIM_READS == "S" ];then
 		
 		MERGE_DIR=$MERGE_TRIM_DIR
@@ -717,97 +761,102 @@ echo "NUM_COUNT_FILES:"	$NUM_COUNT_FILES
 echo "NUM_CG_PAIRS:"	$NUM_CG_PAIRS
 echo "ALL_PROJIDS:"		$ALL_PROJIDS
 
-
-#if [ $NUM_MET_FILES -gt 0 ];then
 	
-	### run metric-key join script 
-	echo "Running "$JOIN_SCRIPT" to combine metrics and key files"
-	echo "sh $JOIN_SCRIPT $MOC_ID $SCRIPT_OPTIONS"
-	sh $JOIN_SCRIPT $MOC_ID $SCRIPT_OPTIONS
+### run metric-key join script 
+echo "Running "$JOIN_SCRIPT" to combine metrics and key files"
+echo "sh $JOIN_SCRIPT $MOC_ID $SCRIPT_OPTIONS"
+sh $JOIN_SCRIPT $MOC_ID $SCRIPT_OPTIONS
+
+### test keymet file to ensure data has been generated for all samples
+for PROJ_ID in $ALL_PROJIDS
+do
+	MET_FILE=`ls -lrt $RESULTS_DIR"/"$PROJ_ID"/"*"metrics.txt" | awk '{print $9}'`	
+	JOIN_FILE=$JOIN_PATH"/"$MOC_ID"/"$PROJ_ID"_KeyMetrics.txt"
+	echo "JOIN_FILE: $JOIN_FILE"
+	ALL_FIELDS=`FIELD_HEADER $JOIN_FILE Sample_ID Pcnt_bc_in_pool Total_reads pcnt_aligned CDS_total_counts_for_replicon rRNA_pcnt_of_counted | tr '\n' ','`
+	TEMP_FILE=$TEMP_DIR$MOC_ID"_"$PROJ_ID"_temp.txt"
 	
-	### test keymet file to ensure data has been generated for all samples
-	for PROJ_ID in $ALL_PROJIDS
-	do
-		MET_FILE=`ls -lrt $RESULTS_DIR"/"$PROJ_ID"/"*"metrics.txt" | awk '{print $9}'`	
-		JOIN_FILE=$JOIN_PATH"/"$MOC_ID"/"$PROJ_ID"_KeyMetrics.txt"
-		echo "JOIN_FILE: $JOIN_FILE"
-		ALL_FIELDS=`FIELD_HEADER $JOIN_FILE Sample_ID Pcnt_bc_in_pool Total_reads pcnt_aligned CDS_total_counts_for_replicon rRNA_pcnt_of_counted | tr '\n' ','`
-		TEMP_FILE=$TEMP_DIR$MOC_ID"_"$PROJ_ID"_temp.txt"
-		
-		echo "Results directory: $RESULTS_DIR"/"$PROJ_ID"/"" > $TEMP_FILE
-		echo "" >> $TEMP_FILE
+	echo "Results directory: $RESULTS_DIR"/"$PROJ_ID"/"" > $TEMP_FILE
+	echo "" >> $TEMP_FILE
 
-		echo "Running report script..."
-		echo "sh $REPORT_SCRIPT $@"
-		echo "" >> $TEMP_FILE
-		echo "sh $REPORT_SCRIPT $@" >> $TEMP_FILE
-		echo "" >> $TEMP_FILE
-		sh $REPORT_SCRIPT $@  | grep -v "Dropping" | grep -v "Prepending"  >> $TEMP_FILE
-		echo "" >> $TEMP_FILE
+	echo "Running report script..."
+	echo "sh $REPORT_SCRIPT $@"
+	echo "" >> $TEMP_FILE
+	echo "sh $REPORT_SCRIPT $@" >> $TEMP_FILE
+	echo "" >> $TEMP_FILE
+	sh $REPORT_SCRIPT $@  | grep -v "Dropping" | grep -v "Prepending"  >> $TEMP_FILE
+	echo "" >> $TEMP_FILE
 
-		cat $JOIN_FILE | sed '/^$/d' | awk -F"\t" -v ALL_FIELDS=$ALL_FIELDS '{
-															y=split(ALL_FIELDS,ar,",")
-															for(i=1; i < y; i++)
-															{
-																if(i == 1)
-																	printf"%-25s\t", $(ar[i])
-																else
-																	printf"%-10s\t", $(ar[i])
-															}
-															print ""
-												
-													}' | awk '{
-																	if(NF == 6) 
-																	{
-																		for(i=1; i < NF; i++)
-																			printf"%-10s\t", $i
-																		print $NF
-																	
-																	}	
-																	else 
-																	{
-																		for(i=1; i < NF+1; i++)
-																			printf"%-10s\t", $i
-																		print "*********DATA missing!***********"
+	cat $JOIN_FILE | sed '/^$/d' | awk -F"\t" -v ALL_FIELDS=$ALL_FIELDS '{
+														y=split(ALL_FIELDS,ar,",")
+														for(i=1; i < y; i++)
+														{
+															if(i == 1)
+																printf"%-25s\t", $(ar[i])
+															else
+																printf"%-10s\t", $(ar[i])
+														}
+														print ""
+											
+												}' | awk '{
+																if(NF == 6) 
+																{
+																	for(i=1; i < NF; i++)
+																		printf"%-10s\t", $i
+																	print $NF
+																
+																}	
+																else 
+																{
+																	for(i=1; i < NF+1; i++)
+																		printf"%-10s\t", $i
+																	print "*********DATA missing!***********"
 
-																	}
-																}'  | sed 's/CDS_total_counts_for_replicon/total_CDS/g' | sort -k5n >> $TEMP_FILE
-												
-												
-		MET_CHECK=`echo $TEMP_FILE	| awk '{print NF}' | sort | uniq | wc -l`
-		echo $MET_CHECK	
-
-		if [ $TRIMMOMATIC_SAMPLE == "Y" ]; then
-			# JOIN_FILE_WITH_TRIMMOMATIC="${JOIN_FILE/.txt/_with_trimmomatic.txt}"
-			JOIN_FILE_WITH_TRIMMOMATIC=$JOIN_FILE
-
-			echo "Combining Trimmomatic stats file with key metrics file"
-
-			echo "python $JOIN_KEY_METRICS_WITH_TRIMMOMATIC_SCRIPT --sample_metrics_file $JOIN_FILE --sample_trimmomatic_stats_dir $TRIMMOMATIC_SAMPLE_LOG_DIR --outfile $JOIN_FILE_WITH_TRIMMOMATIC"
-			python $JOIN_KEY_METRICS_WITH_TRIMMOMATIC_SCRIPT --sample_metrics_file $JOIN_FILE --sample_trimmomatic_stats_dir $TRIMMOMATIC_SAMPLE_LOG_DIR --outfile $JOIN_FILE_WITH_TRIMMOMATIC
-		
-			JOIN_FILE=$JOIN_FILE_WITH_TRIMMOMATIC
-		fi
-
-	### send email with metrics attachment for each project alerting that analysis is complete
-		export TMPDIR=$TEMP_DIR
-	    
-		cat $TEMP_FILE							
-		cat $TEMP_FILE |  mailx -a $JOIN_FILE -s "Analysis of $MOC_ID $PROJ_ID is done" $USID"@broadinstitute.org"
-
-		### Generating pool-wise metrics from sample metrics file
-		POOLWISE_OUT_FILE="${JOIN_FILE/.txt/_poolwise.csv}"
-
-		echo "python $POOLWISE_METRICS_SCRIPT --sample_metrics_file $JOIN_FILE --outfile $POOLWISE_OUT_FILE"
-		python $POOLWISE_METRICS_SCRIPT --sample_metrics_file $JOIN_FILE --outfile $POOLWISE_OUT_FILE
-
-		echo "Poolwise metrics generated: $POOLWISE_OUT_FILE" 
-
-		cat $POOLWISE_OUT_FILE | mailx -a $POOLWISE_OUT_FILE -s "Pool-wise metrics of $MOC_ID $PROJ_ID is done" $USID"@broadinstitute.org"
-	done
+																}
+															}'  | sed 's/CDS_total_counts_for_replicon/total_CDS/g' | sort -k5n >> $TEMP_FILE
+											
+											
+	MET_CHECK=`echo $TEMP_FILE	| awk '{print NF}' | sort | uniq | wc -l`
+	echo $MET_CHECK	
+	
+	### Running keymetrics_analysis2.py
+	echo "Running "$KMA_SCRIPT" for "$JOIN_FILE
+	echo "python $KMA_SCRIPT $JOIN_FILE --outdir $RESULTS_DIR"
+	python $KMA_SCRIPT $JOIN_FILE --outdir $RESULTS_DIR
 
 
-#fi
+
+	if [ $TRIMMOMATIC_SAMPLE == "Y" ]; then
+		# JOIN_FILE_WITH_TRIMMOMATIC="${JOIN_FILE/.txt/_with_trimmomatic.txt}"
+		JOIN_FILE_WITH_TRIMMOMATIC=$JOIN_FILE
+
+		echo "Combining Trimmomatic stats file with key metrics file"
+
+		echo "python $JOIN_KEY_METRICS_WITH_TRIMMOMATIC_SCRIPT --sample_metrics_file $JOIN_FILE --sample_trimmomatic_stats_dir $TRIMMOMATIC_SAMPLE_LOG_DIR --outfile $JOIN_FILE_WITH_TRIMMOMATIC"
+		python $JOIN_KEY_METRICS_WITH_TRIMMOMATIC_SCRIPT --sample_metrics_file $JOIN_FILE --sample_trimmomatic_stats_dir $TRIMMOMATIC_SAMPLE_LOG_DIR --outfile $JOIN_FILE_WITH_TRIMMOMATIC
+	
+		JOIN_FILE=$JOIN_FILE_WITH_TRIMMOMATIC
+	fi
+
+### send email with metrics attachment for each project alerting that analysis is complete
+	export TMPDIR=$TEMP_DIR
+	
+	cat $TEMP_FILE							
+	cat $TEMP_FILE |  mailx -a $JOIN_FILE -s "Analysis of $MOC_ID $PROJ_ID is done" $USID"@broadinstitute.org"
+
+	### Generating pool-wise metrics from sample metrics file
+	POOLWISE_OUT_FILE="${JOIN_FILE/.txt/_poolwise.csv}"
+
+	echo "python $POOLWISE_METRICS_SCRIPT --sample_metrics_file $JOIN_FILE --outfile $POOLWISE_OUT_FILE"
+	python $POOLWISE_METRICS_SCRIPT --sample_metrics_file $JOIN_FILE --outfile $POOLWISE_OUT_FILE
+
+	echo "Poolwise metrics generated: $POOLWISE_OUT_FILE" 
+
+	cat $POOLWISE_OUT_FILE | mailx -a $POOLWISE_OUT_FILE -s "Pool-wise metrics of $MOC_ID $PROJ_ID is done" $USID"@broadinstitute.org"
+
+done
+
+ 
 
 if [ $NUM_CG_PAIRS -gt 0 ];then
 	### run DE pipeline
@@ -815,6 +864,10 @@ if [ $NUM_CG_PAIRS -gt 0 ];then
 	echo "sh $DE_PIPE $MOC_ID $SCRIPT_OPTIONS -move_key N"
 	sh $DE_PIPE $MOC_ID $SCRIPT_OPTIONS -move_key N
 fi
+
+cp -R $DATA_DIR $RESULTS_DIR
+
+
 
 ### change permissions for Results and temp dirs
 change_perms $MOC_SYM_DIR $RESULTS_DIR $TEMP_DIR $KEY_FILE $BAM_DIR

@@ -125,7 +125,7 @@ echo "pull desktop files for all/recently changed MOCS submission wbs from $GWB_
 		$scripts_dir"GS_import.py" -s $GID -t "Pooling" -p $NAME --Key_dir $MOCSDB_DIR -S "_Pool_Sub_WB.txt" 
 
 	done
-
+ 
  	PROC=`ls -lrt $MOCSDB_DIR* | grep $MOCS | awk '{y=split($9,ar,"/");split(ar[y],pr,"_");print pr[2]}'`
 
 	# Make $MOCS_DB and push to GDrive
@@ -180,11 +180,11 @@ echo "Making symlinks in MOCS dir"
 		SYM=$MOCS_SYMDIR$FILE
 		for COMBO in $MOCS_COMBOS
 		do
-			MOCS=`echo $COMBO | sed 's/;/ /g' | awk '{print $1}'`
-			POOL=`echo $COMBO | sed 's/;/ /g' | awk '{print $2}'`
-			INDEX=`echo $COMBO | sed 's/;/ /g' | awk '{print $3"_"$4}'`
+			MOCS=`echo $COMBO | sed 's/,/ /g' | awk '{print $1}'`
+			POOL=`echo $COMBO | sed 's/,/ /g' | awk '{print $2}'`
+			INDEX=`echo $COMBO | sed 's/,/ /g' | awk '{print $3"_"$4}'`
 			MATCH=`echo $FASTQ | grep $INDEX | wc -l`
-		
+			
 			if [ $MATCH -gt "0" ];then
 		
 				SYM=`echo $SYM | sed 's*'$INDEX'*'$POOL'*g'`
@@ -204,7 +204,10 @@ echo "Making symlinks in MOCS dir"
 echo "Making symlinks in MOC dirs"
 
 	# Pull out all MOCIDs
-	ALL_FILES=`ls -lrt $MOCS_SYMDIR | grep -v Undeter | grep fastq | grep -v _X | awk '{print $9}'`
+	ALL_FILES=`ls -lrt $MOCS_SYMDIR | grep -v Undeter | grep fastq | grep MOCP | awk '{print $9}'`
+
+echo $MOCS_SYMDIR 
+echo $ALL_FILES
 
 	ALL_MOCIDS=`echo $ALL_FILES | awk '{
 
@@ -279,7 +282,7 @@ echo "Making symlinks in MOC dirs"
 		
 		ln -s $FASTQ_FILE $SYM_FILE
 
-	done < $FASTQ_FILE
+	done 
 
 # List all symlinks in MOC symlink dirs
 	for MOCID in $ALL_MOCIDS

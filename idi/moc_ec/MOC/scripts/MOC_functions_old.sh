@@ -173,11 +173,6 @@ paths_and_headers ()
 		JOIN_SCRIPT="$PROJECT_ROOT_DIR/$JOIN_SCRIPT"
 	fi
 	
-	KMA_SCRIPT=`config_read $CONFIG_FILE keyMetrics_analysis_script`
-	if [[ $KMA_SCRIPT != /* ]]; then
-		KMA_SCRIPT="$PROJECT_ROOT_DIR/$KMA_SCRIPT"
-	fi
-
 	POOLWISE_METRICS_SCRIPT=`config_read $CONFIG_FILE poolwise_metrics_script`
 	if [[ $POOLWISE_METRICS_SCRIPT != /* ]]; then
 		POOLWISE_METRICS_SCRIPT="$PROJECT_ROOT_DIR/$POOLWISE_METRICS_SCRIPT"
@@ -329,7 +324,7 @@ paths_and_headers ()
 	KEY_TYPE=`extract_option -key_type P 1 $SCRIPT_OPTIONS`
 	TEST_PIPE=`extract_option -test_pipe N 1 $SCRIPT_OPTIONS`
 	NUM_TEST_READS=`extract_option -num_test_reads 10000 1 $SCRIPT_OPTIONS`
-	TRIM_READS=`extract_option -trim_reads Y 1 $SCRIPT_OPTIONS` # pre-trim reads
+	TRIM_READS=`extract_option -trim_reads N 1 $SCRIPT_OPTIONS` # pre-trim reads
 	TRIM_LEN=`extract_option -trim_len 0-50,5-55 1 $SCRIPT_OPTIONS` # target trim length
 	DO_HOST=`extract_option -do_host N 1 $SCRIPT_OPTIONS`
 	ADD_UMI_TO_READ_ID=`extract_option -add_umi_to_read_id N 1 $SCRIPT_OPTIONS`
@@ -383,7 +378,7 @@ paths_and_headers ()
 	
 	#### find all project IDs
 	
-	ALL_PROJ=`cat $KEY_FILE | grep -v "###" | grep -v "COLLAB" | sed 1d | awk -F"\t" '{print $3}' | sed '/^$/d' | sort | uniq`
+	ALL_PROJ=`cat $KEY_FILE | grep -v "###" | grep -v "COLLAB" | sed 1d | awk '{print $2}' | sort | uniq`
 	echo $ALL_PROJ
 	ALL_PROJID=`echo $ALL_PROJ | sed 's/ /_/g' `
 	
@@ -852,8 +847,6 @@ project_type ()
 		DEV_PREFIX=`config_read $CONFIG_FILE Dev_prefixes`
 		TC_PREFIX=`config_read $CONFIG_FILE TC_prefixes`
 		CIS_PREFIX=`config_read $CONFIG_FILE CIS_prefixes`
-		TRF_PREFIX=`config_read $CONFIG_FILE TRF_prefixes`
-		HVP_PREFIX=`config_read $CONFIG_FILE HVP_prefixes`
 
 		MOCID_PREFIX=`echo $MOC_ID | cut -d"-" -f1`
 
@@ -868,12 +861,6 @@ project_type ()
 		fi
 		if [ `echo $CIS_PREFIX | grep $MOCID_PREFIX | wc -l` -eq 1 ];then
 			PROJ_TYPE="CIS"
-		fi
-		if [ `echo $TRF_PREFIX | grep $MOCID_PREFIX | wc -l` -eq 1 ];then
-			PROJ_TYPE="TRF"
-		fi
-		if [ `echo $HVP_PREFIX | grep $MOCID_PREFIX | wc -l` -eq 1 ];then
-			PROJ_TYPE="HVP"
 		fi
 		echo $PROJ_TYPE
 	fi
@@ -1041,18 +1028,7 @@ gdrive_gid ()
 		PROJ_ID=`echo $MOC_ID | cut -d"." -f1`
 		GKEY_FILE=$GMOC_PATH"/"$TYPE"/Experiments/"$MOC_ID"/"$MOC_ID"_Key"
 	fi
-	if [ $PROJ_PATH == "TRF" ];then
-		GMOC_PATH=`config_read $CONFIG_FILE gdriveTRF_path`
-		TYPE=`echo $MOC_ID | cut -d"-" -f1`
-		PROJ_ID=`echo $MOC_ID | cut -d"." -f1`
-		GKEY_FILE=$GMOC_PATH"/Experiments/"$MOC_ID"/"$MOC_ID"_Key"
-	fi
-	if [ $PROJ_PATH == "HVP" ];then
-		GMOC_PATH=`config_read $CONFIG_FILE gdriveHVP_path`
-		TYPE=`echo $MOC_ID | cut -d"-" -f1`
-		PROJ_ID=`echo $MOC_ID | cut -d"." -f1`
-		GKEY_FILE=$GMOC_PATH"/Experiments/"$MOC_ID"/"$MOC_ID"_Key"
-	fi
+
 	GLOCAL_PATH=`config_read $CONFIG_FILE gdrivelocal_path`
 	GDRIVE_SCRIPT=`config_read $CONFIG_FILE gdrive_script`
 
@@ -1256,7 +1232,6 @@ UGER_test ()
 
 move_key () 
 { 
-	echo "CONFIG_FILE:" $CONFIG_FILE
 	
 	if [ $GID_OPT == "0" ];then
 		echo "Getting GID from Gdrive using the path in $CONFIG_FILE"

@@ -3,9 +3,6 @@
 MOC_ID=$1
 shift
 
-### source all functions 
-# source "/idi/moc_ec/MOC/scripts/MOC_functions.sh"
-
 # get path of the current file. if the file path is relative, convert it to absolute path
 file_path="${BASH_SOURCE[0]}"
 if [[ $file_path != /* ]]; then
@@ -17,6 +14,7 @@ PROJECT_ROOT_DIR="$(dirname $(dirname $(dirname $(dirname $(dirname $file_path))
 # get parent directory
 scripts_dir="$(dirname $file_path)"
 
+### source all functions 
 source "$scripts_dir/MOC_functions.sh"
 
 ### determining paths and headers 
@@ -124,7 +122,7 @@ do
 														if(NR==p)
 															print $'$KEY_PID_F'
 													}' | head -1 | sed 's/_combined//g'`
-	
+													#}' | head -1 | sed 's/_combined//g'`
 	KEY_INDEX1=`cat $TEMP_KEY_FILE | awk -F"\t" -v p=$p '{
 														if(NR==p)
 															print $'$INDEX1_F'
@@ -188,7 +186,8 @@ do
 		if [ -s $METRICS_FILE ];then
 			QUERY_F=`FIELD_HEADER $METRICS_FILE $QUERY_HEADER`
 			MET_REP_F=`FIELD_HEADER $METRICS_FILE "For_replicon..."`
-			ALL=`cat $METRICS_FILE | grep $KEY_REF | sed 's/_combined//' | awk -F"\t" -v KEY_SAMPID=$KEY_SAMPID -v QUERY_F=$QUERY_F -v KEY_REF=$KEY_REF '{if($QUERY_F==KEY_SAMPID"_"KEY_REF)print $'$MET_REP_F'}' | grep "ALL" | wc -l`		
+			#ALL=`cat $METRICS_FILE | grep $KEY_REF | sed 's/_combined//' | awk -F"\t" -v KEY_SAMPID=$KEY_SAMPID -v QUERY_F=$QUERY_F -v KEY_REF=$KEY_REF '{if($QUERY_F==KEY_SAMPID"_"KEY_REF)print $'$MET_REP_F'}' | grep "ALL" | wc -l`		
+			ALL=`cat $METRICS_FILE | grep $KEY_REF | awk -F"\t" -v KEY_SAMPID=$KEY_SAMPID -v QUERY_F=$QUERY_F -v KEY_REF=$KEY_REF '{if($QUERY_F==KEY_SAMPID"_"KEY_REF)print $'$MET_REP_F'}' | grep "ALL" | wc -l`		
 			echo "ALL: "$ALL
 			echo "MET_REP_F: "$MET_REP_F
 			echo "QUERY_F: "$QUERY_F
@@ -234,8 +233,9 @@ do
 			echo $KEY_INDEX
 			echo $KEY_BC
 			
-			cat $BC_FILE | grep -v "#" | sed 's/_combined//' | awk -F"\t" -v p=$p -v KEY_INDEX=$KEY_INDEX -v KEY_BC=$KEY_BC -v ALL=$ALL '{
-							
+			
+			#cat $BC_FILE | grep -v "#" | sed 's/_combined//' | awk -F"\t" -v p=$p -v KEY_INDEX=$KEY_INDEX -v KEY_BC=$KEY_BC -v ALL=$ALL '{
+			cat $BC_FILE | grep -v "#"  | awk -F"\t" -v p=$p -v KEY_INDEX=$KEY_INDEX -v KEY_BC=$KEY_BC -v ALL=$ALL '{
 								
 								if(NR==1)
 								{
@@ -257,8 +257,8 @@ do
 
 		if [ -s $METRICS_FILE ];then
 
-			cat $METRICS_FILE | grep -v "#" | grep $KEY_REF | sed 's/_combined//' | awk -F"\t" -v p=$p -v KEY_REF=$KEY_REF -v KEY_SAMPID=$KEY_SAMPID -v QUERY_F=$QUERY_F -v ALL=$ALL '{
-
+			#cat $METRICS_FILE | grep -v "#" | grep $KEY_REF | sed 's/_combined//' | awk -F"\t" -v p=$p -v KEY_REF=$KEY_REF -v KEY_SAMPID=$KEY_SAMPID -v QUERY_F=$QUERY_F -v ALL=$ALL '{
+			cat $METRICS_FILE | grep -v "#" | grep $KEY_REF  | awk -F"\t" -v p=$p -v KEY_REF=$KEY_REF -v KEY_SAMPID=$KEY_SAMPID -v QUERY_F=$QUERY_F -v ALL=$ALL '{
 																								#print $0
 																								if($QUERY_F==KEY_SAMPID"_"KEY_REF && (ALL=="0" || $'$MET_REP_F'=="ALL"))
 																									for(i=1; i < NF+1; i++) 
@@ -277,3 +277,4 @@ done
 change_perms $JOIN_DIR
 
 echo $JOIN_FILE
+

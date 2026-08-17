@@ -119,6 +119,8 @@ ALL_PROJID=`cat $TEMP_FILE | awk -F"\t" -v PID_FIELD=$PID_FIELD '{print $PID_FIE
 echo $KEY_FILE
 echo $ALL_PROJID
 
+echo $PAIRS_FIELD
+
 for PROJ_ID in $ALL_PROJID
 do
 
@@ -137,6 +139,10 @@ do
 		NUM_PAIR=`echo $PAIR | awk '{y=split($1, ar, ","); print y}'`
 		if [ $NUM_PAIR -ne 2 ];then
 			echo $PAIR" does not have the proper number of CG_IDs!"
+			echo $TEMP_FILE
+			echo $PAIRS_FIELD
+			echo $PID_FIELD
+			echo $ALL_PAIRS_OPT
 			exit
 		fi
 	

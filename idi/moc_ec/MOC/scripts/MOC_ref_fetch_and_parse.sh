@@ -122,6 +122,8 @@ if [ $PROJ_TYPE == "P" ];then
 	GREF_DIR=$GMOC_PATH"/"$MOC_ID"/Reference_files/"
 else
 
+	TYPE=`echo $MOC_ID | cut -d"-" -f1`
+	PROJ_ID=`echo $MOC_ID | cut -d"." -f1`
 	if [ $PROJ_TYPE == "D" ];then
 		GMOC_PATH=`config_read $CONFIG_FILE gdriveDEV_path`
 	fi
@@ -131,10 +133,18 @@ else
 	if [ $PROJ_TYPE == "CIS" ];then
 		GMOC_PATH=`config_read $CONFIG_FILE gdriveCIS_path`
 	fi
-	
-	TYPE=`echo $MOC_ID | cut -d"-" -f1`
-	PROJ_ID=`echo $MOC_ID | cut -d"." -f1`
+
 	GREF_DIR=$GMOC_PATH"/"$TYPE"/Experiments/"$MOC_ID"/Reference_files/"
+	
+	if [ $PROJ_TYPE == "TRF" ];then
+		GMOC_PATH=`config_read $CONFIG_FILE gdriveTRF_path`
+		GREF_DIR=$GMOC_PATH"/Experiments/"$MOC_ID"/Reference_files/"
+	fi
+	if [ $PROJ_TYPE == "HVP" ];then
+		GMOC_PATH=`config_read $CONFIG_FILE gdriveHVP_path`
+		GREF_DIR=$GMOC_PATH"/Experiments/"$MOC_ID"/Reference_files/"
+	fi
+
 fi
 
 GLOCAL_DIR=$GLOCAL_PATH"/"$GREF_DIR

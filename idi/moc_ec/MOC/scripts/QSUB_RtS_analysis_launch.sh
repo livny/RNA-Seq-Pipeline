@@ -31,6 +31,9 @@ fi
 # Get paths to dirs scripts from config file
 read_config $CONFIG_FILE 
 
+echo $CONFIG_FILE 
+
+
 ### run path_suff function to set RESPATH_SUFF.
 ##	If -moc_id N included in command line, do not moc_ID to RESPATH_SUFF.  
 ##	If -user_id included with Y or no string add USID to RESPATH_SUFF.  
@@ -62,6 +65,7 @@ echo "source $scripts_dir/bash_header"  > $QSUB_FILE
 echo "sh $RtS_ANPIPE $@" >> $QSUB_FILE
 
 cat $QSUB_FILE
+
 echo "qsub -e $QSUB_ERR_FILE -o $QSUB_OUT_FILE -l h_rt=24:00:00 -l h_vmem=8g -l os=RedHat7 $QSUB_FILE" 
 qsub -e $QSUB_ERR_FILE -o $QSUB_OUT_FILE -l h_rt=24:00:00 -l h_vmem=8g -l os=RedHat7 $QSUB_FILE
 
